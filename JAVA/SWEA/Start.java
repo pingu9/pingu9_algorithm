@@ -13,7 +13,7 @@ public class Start {
         for (int testCase = 1; testCase <= T; testCase ++) {
             int result = 0;
 
-            System.out.printf("#%d %d", testCase, result);
+            System.out.printf("#%d %d\n", testCase, result);
         }
 
     }
