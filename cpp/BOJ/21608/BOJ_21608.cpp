@@ -4,11 +4,10 @@
 
 using namespace std;
 
-int prefer_list[21][4];
+int prefer_list[401][4];
 int student_order[401];
 int map[21][21];
 int N;
-int cur_y, cur_x;
 int blank_count;
 int prefer_count;
 
@@ -26,7 +25,11 @@ int check_prefer(int y, int x, int current_student_num)
             return 1;
         }
     }
-    blank_count++;
+    if (map[y][x] == 0)
+    {
+        blank_count++;
+    }
+
     return 0;
 }
 
@@ -34,11 +37,15 @@ void fill_map(int current_student_num)
 {
     int max_prefer_count = -1;
     int max_blank_count = -1;
+    int cur_y, cur_x;
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
         {
-            int prefer = 0;
+            if (map[i][j])
+            {
+                continue;
+            }
             prefer_count = 0;
             blank_count = 0;
             check_prefer(i - 1, j, current_student_num);
@@ -48,6 +55,7 @@ void fill_map(int current_student_num)
             if (prefer_count > max_prefer_count)
             {
                 max_prefer_count = prefer_count;
+                max_blank_count = blank_count;
                 cur_y = i;
                 cur_x = j;
             }
@@ -62,34 +70,13 @@ void fill_map(int current_student_num)
             }
         }
     }
-    cout << cur_y << ' ' << cur_x << '\n';
+
+    // cout << cur_y << ' ' << cur_x << '\n';
     map[cur_y][cur_x] = current_student_num;
 }
 
-int main()
+int calculate_score()
 {
-    cin.tie(NULL);
-    ios_base::sync_with_stdio(false);
-
-    cin >> N;
-
-    for (int i = 0; i < N * N; i++)
-    {
-        int cur_student;
-        cin >> cur_student;
-        student_order[i] = cur_student;
-
-        for (int j = 0; j < 4; j++)
-        {
-            cin >> prefer_list[cur_student][j];
-        }
-    }
-
-    for (int i = 0; i < N * N; i++)
-    {
-        fill_map(student_order[i]);
-    }
-
     int score = 0;
     for (int i = 0; i < N; i++)
     {
@@ -118,6 +105,34 @@ int main()
             }
         }
     }
+    return score;
+}
+
+int main()
+{
+    cin.tie(NULL);
+    ios_base::sync_with_stdio(false);
+
+    cin >> N;
+
+    for (int i = 0; i < N * N; i++)
+    {
+        int cur_student;
+        cin >> cur_student;
+        student_order[i] = cur_student;
+
+        for (int j = 0; j < 4; j++)
+        {
+            cin >> prefer_list[cur_student][j];
+        }
+    }
+
+    for (int i = 0; i < N * N; i++)
+    {
+        fill_map(student_order[i]);
+    }
+
+    int score = calculate_score();
 
     cout << score << '\n';
 }
