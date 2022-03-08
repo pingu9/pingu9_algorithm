@@ -12,15 +12,18 @@ struct q_info
     int blue_pos_y;
     int blue_pos_x;
     int direction;
+    int level;
 };
 
 int N, M;
 
 char map[10][10];
-int dy[4] = {-1, 0, 1, 0};
-int dx[4] = {0, 1, 0, -1};
+int dy[4] = { -1, 0, 1, 0 };
+int dx[4] = { 0, 1, 0, -1 };
 
 int red_pos_y, red_pos_x, blue_pos_y, blue_pos_x;
+
+queue<q_info> q;
 
 bool progress_red(int y, int x, int direction)
 {
@@ -42,7 +45,8 @@ bool progress_red(int y, int x, int direction)
     {
         red_pos_y = y;
         red_pos_x = x;
-        return (y + dy[direction], x + dx[direction], direction);
+        //cout << "imhere!  " << red_pos_y << ' ' << red_pos_x <<  ' ' << direction << '\n';
+        return progress_red(y + dy[direction], x + dx[direction], direction);
     }
     return false;
 }
@@ -67,18 +71,19 @@ bool progress_blue(int y, int x, int direction)
     {
         blue_pos_y = y;
         blue_pos_x = x;
-        return (y + dy[direction], x + dx[direction], direction);
+        return progress_blue(y + dy[direction], x + dx[direction], direction);
     }
     return false;
 }
 
-bool progress(int r_y, int r_x, int direction, queue<q_info> q)
+bool progress(int r_y, int r_x, int b_y, int b_x, int direction, int level)
 {
     bool result_red = false;
     bool result_blue = false;
     result_red = progress_red(r_y, r_x, direction);
-    result_blue = progress_red(r_y, r_x, direction);
-    result_red = progress_red(r_y, r_x, direction);
+    result_blue = progress_blue(b_y, b_x, direction);
+    result_red = progress_red(red_pos_y, red_pos_x, direction);
+    
 
     if (result_red && result_blue)
     {
@@ -93,6 +98,13 @@ bool progress(int r_y, int r_x, int direction, queue<q_info> q)
         return true;
     }
 
+    if (red_pos_y == r_y && red_pos_x == r_x && blue_pos_y == b_y && blue_pos_x == b_x)
+    {
+        return false;
+    }
+
+    cout << "progressed in direction" << direction << "\nr_y = " << red_pos_y << ",r_x = " << red_pos_x << ",b_y = " << blue_pos_y << ",b_x = " << blue_pos_x << ' ' << level << '\n';
+
     for (int i = 0; i < 4; i++)
     {
         struct q_info info;
@@ -101,6 +113,7 @@ bool progress(int r_y, int r_x, int direction, queue<q_info> q)
         info.blue_pos_y = blue_pos_y;
         info.blue_pos_x = blue_pos_x;
         info.direction = i;
+        info.level = level + 1;
         q.push(info);
     }
 
@@ -134,7 +147,7 @@ int main()
         }
     }
 
-    queue<q_info> q;
+    
 
     for (int i = 0; i < 4; i++)
     {
@@ -144,15 +157,38 @@ int main()
         info.blue_pos_y = blue_pos_y;
         info.blue_pos_x = blue_pos_x;
         info.direction = i;
+        info.level = 1;
         q.push(info);
     }
 
-    int level = 0;
+  //  int level = 1;
     while (!q.empty())
     {
+        struct q_info info = q.front();
+        q.pop();
+        int r_y = info.red_pos_y;
+        int r_x = info.red_pos_x;
+        int b_y = info.blue_pos_y;
+        int b_x = info.blue_pos_x;
+        int direction = info.direction;
+        int level = info.level;
+        if (level > 10) {
+            break;
+        }
+        // cout << "current_q_info = " << r_y << ' ' << r_x << ' ' << b_y << ' ' << b_x << ' ' << direction << '\n';
+
+        if (progress(r_y, r_x, b_y, b_x, direction, level))
+        {
+            cout << level << '\n';
+            return 0;
+        }
+
+        /*
         if (level > 10)
             break;
-        for (int i = 0; i < q.size(); i++)
+        int q_size = q.size();
+        //cout << q_size << '\n';
+        for (int i = 0; i < q_size; i++)
         {
             struct q_info info = q.front();
             q.pop();
@@ -161,14 +197,16 @@ int main()
             int b_y = info.blue_pos_y;
             int b_x = info.blue_pos_x;
             int direction = info.direction;
+           // cout << "current_q_info = " << r_y << ' ' << r_x << ' ' << b_y << ' ' << b_x << ' ' << direction << '\n';
 
-            if (progress(r_y, r_x, direction, q))
+            if (progress(r_y, r_x, b_y, b_x, direction))
             {
                 cout << level << '\n';
                 return 0;
             }
         }
         level++;
+        */
     }
 
     cout << -1 << '\n';
