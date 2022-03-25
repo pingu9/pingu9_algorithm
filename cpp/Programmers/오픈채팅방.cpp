@@ -3,12 +3,7 @@
 #include <algorithm>
 #include <sstream>
 #include <map>
-
-using namespace std;
-
-
 #include <string>
-#include <vector>
 
 using namespace std;
 
@@ -53,9 +48,4 @@ vector<string> solution(vector<string> record) {
     }
 
         return answer;
-}
-
-int main()
-{
-
 }
